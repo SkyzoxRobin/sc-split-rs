@@ -10,20 +10,44 @@ elrond_wasm::imports!();
 // Contract
 #[elrond_wasm_derive::contract]
 pub trait Pools:
- config::ConfigModule {
+ config::ConfigModule 
+ {
 	#[init]
 	fn init(
 		&self,
-		deposit_token: TokenIdentifier, // the deposit token generally it will be sARN
-		reward_token: TokenIdentifier, // the reward token
-		// _reward_amount: Self::BigUint,
-		start_block: Self::BigUint,
-		 end_block: Self::BigUint,
-		// _fee_address: Address,
-		#[var_args] opt_token_identifier: OptionalArg<TokenIdentifier>
+		// token_id = TokenIdentifier, 
 	) -> SCResult<()> {
 
 		Ok(())
 	}
+
+	#[payable("EGLD")]
+	#[endpoint(splitEGLD)]
+	fn split_egld(
+		&self,
+		recipients: Vec<Address>,
+		amount: Vec<Self::BigUint>
+	) -> SCResult<()> {
+
+		for i in 0..recipients.len() {
+			self.send().direct_egld(&recipients[i], &amount[i], b"split",);
+
+			// get caller 
+			let caller = self.blockchain().get_caller();
+			// get balance of the caller
+		}
+		Ok(())
+	}
+
+	  // contract Disperse {
+		 //	function disperseEther(address[] recipients, uint256[] values) external payable {
+		//	for (uint256 i = 0; i < recipients.length; i++)
+			//	recipients[i].transfer(values[i]);
+		//	uint256 balance = address(this).balance;
+		//	if (balance > 0)
+		//		msg.sender.transfer(balance);
+		//	}
+
+	// disperse esdt 
 
 }
