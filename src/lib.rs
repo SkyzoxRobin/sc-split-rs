@@ -25,15 +25,18 @@ pub trait Pools:
 	#[endpoint(splitEGLD)]
 	fn split_egld(
 		&self,
-		recipients: Vec<Address>,
-		amount: Vec<Self::BigUint>
+		// recipients: Vec<Address>,
+		// amount: Vec<Self::BigUint>
+		#[var_args] VarArgs<MultiArg2<Address, BigUint>>
 	) -> SCResult<()> {
 
 		for i in 0..recipients.len() {
-			self.send().direct_egld(&recipients[i], &amount[i], b"split",);
+			self.send().direct_egld(&Address[i], &amount[i], b"splitEGLD",);
+
+
 
 			// get caller 
-			let caller = self.blockchain().get_caller();
+			// let _caller = self.blockchain().get_caller();
 			// get balance of the caller
 		}
 		Ok(())
