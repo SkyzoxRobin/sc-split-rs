@@ -3,8 +3,8 @@ ADDRESS=$(erdpy data load --key=address-devnet)
 PROXY="https://devnet-gateway.elrond.com"
 CHAIN_ID="D"
 DEPLOY_TRANSACTION=$(erdpy data load --key=deployTransaction-devnet)
-SC_ADDRESS="erd1qqqqqqqqqqqqqpgqt8p766fgve72f4ey9kakhy467g7a5jzt2yusa8dzwu"
-EGLD="1000000000000000000" # 18 decimals
+SC_ADDRESS="erd1qqqqqqqqqqqqqpgq0egrpdjaj9a6luglxj9uwtl83k2799kl2yusx9azw7"
+EGLD="1000000000000000000" # 18 decimal
 
 
 deploy() {
@@ -14,7 +14,6 @@ deploy() {
         --gas-price=1499999999 \
         --gas-limit=1499999999 \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
-        # --arguments 0 \
         --outfile="deploy-devnet.interaction.json" --send || return
 
     TRANSACTION=$(erdpy data parse --file="deploy-devnet.interaction.json" --expression="data['emitted_tx']['hash']")
