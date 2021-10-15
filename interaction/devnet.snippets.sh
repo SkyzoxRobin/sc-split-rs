@@ -3,7 +3,8 @@ ADDRESS=$(erdpy data load --key=address-devnet)
 PROXY="https://devnet-gateway.elrond.com"
 CHAIN_ID="D"
 DEPLOY_TRANSACTION=$(erdpy data load --key=deployTransaction-devnet)
-SC_ADDRESS="erd1qqqqqqqqqqqqqpgqp8tsypy7x4m4w4f8n3qn33fjcl2gzkjp2yusq4mlr7"
+SC_ADDRESS="erd1qqqqqqqqqqqqqpgqt8p766fgve72f4ey9kakhy467g7a5jzt2yusa8dzwu"
+EGLD="1000000000000000000" # 18 decimals
 
 
 deploy() {

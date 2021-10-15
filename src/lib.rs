@@ -7,9 +7,8 @@ pub mod config;
 elrond_wasm::imports!();
 // elrond_wasm::derive_imports!();
 
-// Contract
 #[elrond_wasm_derive::contract]
-pub trait Pools:
+pub trait Disperse:
  config::ConfigModule 
  {
 	#[init]
@@ -17,7 +16,6 @@ pub trait Pools:
 		&self,
 		// token_id = TokenIdentifier, 
 	) -> SCResult<()> {
-
 		Ok(())
 	}
 
@@ -25,32 +23,20 @@ pub trait Pools:
 	#[endpoint(splitEGLD)]
 	fn split_egld(
 		&self,
-		// recipients: Vec<Address>,
-		// amount: Vec<Self::BigUint>
-		#[var_args] VarArgs<MultiArg2<Address, BigUint>>
+		#[var_args] args: VarArgs<MultiArg2<Address, Self::BigUint>> // recipients and amounts 
 	) -> SCResult<()> {
 
-		for i in 0..recipients.len() {
-			self.send().direct_egld(&Address[i], &amount[i], b"splitEGLD",);
-
-
-
-			// get caller 
-			// let _caller = self.blockchain().get_caller();
-			// get balance of the caller
+		for payment in args.iter(){
+			let recipient = payment.0.0.clone();
+			let amount = payment.0.1.clone();		  
+			self.send().direct_egld(&recipient, &amount, b"splitEGLD",); // should have recipient & amount as argument
 		}
 		Ok(())
 	}
 
-	  // contract Disperse {
-		 //	function disperseEther(address[] recipients, uint256[] values) external payable {
-		//	for (uint256 i = 0; i < recipients.length; i++)
-			//	recipients[i].transfer(values[i]);
-		//	uint256 balance = address(this).balance;
-		//	if (balance > 0)
-		//		msg.sender.transfer(balance);
-		//	}
 
-	// disperse esdt 
+	// split esdt 
+
+	// split sft
 
 }
