@@ -30,12 +30,33 @@ pub trait Disperse:
 			let recipient = payment.0.0.clone();
 			let amount = payment.0.1.clone();		  
 			self.send().direct_egld(&recipient, &amount, b"splitEGLD",); // should have recipient & amount as argument
+
+			//  get caller 
+			// 	returned the excess amount or return an error if the total amount is not right
+			// get total amount to send 
 		}
 		Ok(())
 	}
 
 
 	// split esdt 
+	#[payable("*")]
+	#[endpoint(splitESDT)]
+	fn split_esdt(
+		&self,
+		#[var_args] args: VarArgs<MultiArg3<TokenIdentifier, Address, Self::BigUint>> // recipients and amounts 
+	) -> SCResult<()> {
+
+		for payment in args.into_vec(){
+			let (token_id, recipient, amount) = payment.into_tuple();
+			self.send().direct(&recipient, &token_id, 0, &amount, b"splitESDT",); // should have recipient & amount as argument
+		}
+
+		// get caller 
+		// returned the excess amount or return an error if the total amout sent is not right
+		// get total amount to send
+		Ok(())
+	}
 
 	// split sft
 
