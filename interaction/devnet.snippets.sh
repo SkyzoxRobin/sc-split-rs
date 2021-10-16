@@ -1,4 +1,4 @@
-OWNER="wallets/owner/wallet-owner.pem"
+OWNER="../../wallet-owner.pem"
 ADDRESS=$(erdpy data load --key=address-devnet)
 PROXY="https://devnet-gateway.elrond.com"
 CHAIN_ID="D"
