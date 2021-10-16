@@ -23,6 +23,7 @@ pub trait Disperse:
 	#[endpoint(splitEGLD)]
 	fn split_egld(
 		&self,
+		// token_amount pour avoir l'amount envoyé
 		#[var_args] args: VarArgs<MultiArg2<Address, Self::BigUint>>
 	) -> SCResult<()> {
 
@@ -38,23 +39,24 @@ pub trait Disperse:
 		Ok(())
 	}
 
-
 	// split esdt 
 	#[payable("*")]
 	#[endpoint(splitESDT)]
 	fn split_esdt(
 		&self,
-		#[var_args] args: VarArgs<MultiArg3<TokenIdentifier, Address, Self::BigUint>>
+		#[payment_token] token_id: TokenIdentifier,
+		//token_amount: Self::BigUint
+		#[var_args] args: VarArgs<MultiArg2<Address, Self::BigUint>>
 	) -> SCResult<()> {
 
 		for payment in args.into_vec(){
-			let (token_id, recipient, amount) = payment.into_tuple();
+			let (recipient, amount) = payment.into_tuple();
 			self.send().direct(&recipient, &token_id, 0, &amount, b"splitESDT",);
 		}
 
 		// get caller 
 		// returned the excess amount or return an error if the total amout sent is not right
-		// get total amount to send
+		// get total amount to send if I send the excess
 		Ok(())
 	}
 
