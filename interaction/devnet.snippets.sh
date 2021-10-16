@@ -8,7 +8,6 @@ EGLD="1000000000000000000" # 18 decimal
 
 
 deploy() {
-
     erdpy --verbose contract deploy --project=${PROJECT} --recall-nonce \
         --pem=${OWNER} \
         --gas-price=1499999999 \
