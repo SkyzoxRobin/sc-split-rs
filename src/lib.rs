@@ -22,19 +22,19 @@ pub trait Disperse:
 	#[endpoint(splitEGLD)]
 	fn split_egld(
 		&self,
-		token_amount: Self::BigUint,
+		#[payment_amount] token_amount: Self::BigUint,
 		#[var_args] args: VarArgs<MultiArg2<Address, Self::BigUint>>
 	) -> SCResult<()> {
 
 		let mut sum = Self::BigUint::zero(); 
 		let arguments = args.into_vec(); 
 
-		for payment in arguments.clone() {
-			let (_recipient, amount) = payment.into_tuple();
+		for check_payment in arguments.clone() {
+			let (_recipient, amount) = check_payment.into_tuple();
 			sum += amount; 
-		};
+		}
 
-		require!(token_amount == sum, "The sum sent is not equal to the total amount");
+		require!(token_amount == sum, "The sum sent is not equal to the total amount to send");
 		
 		for payment in arguments {
 			let (recipient, amount) = payment.into_tuple(); 
@@ -50,7 +50,7 @@ pub trait Disperse:
 	fn split_esdt(
 		&self,
 		#[payment_token] token_id: TokenIdentifier,
-		token_amount: Self::BigUint,
+		#[payment_amount] token_amount: Self::BigUint,
 		#[var_args] args: VarArgs<MultiArg2<Address, Self::BigUint>>
 	) -> SCResult<()> {
 
@@ -60,7 +60,7 @@ pub trait Disperse:
 		for payment in arguments.clone() {
 			let (_recipient, amount) = payment.into_tuple(); 
 			sum += amount; 
-		}; 
+		}
 
 		require!(token_amount == sum, "The sum sent is not equal to the total amount");
 
@@ -88,4 +88,19 @@ pub trait Disperse:
 		Ok(())
 	}
 
+}
+
+splitEGLD {
+    Sender: <votre adresse>
+    Receiver: <l'adresse du smart contract>
+    Value: <la valeur totale de ce que vous voulez envoyer>
+    GasLimit: 20000000> // à augmenter si vous voulez envoyer vers beaucoup d'adresse
+    Data: "splitEGLD" +
+          "@" + <votre destinataire 1 > l'adresse du destinataire doit être décodé +
+          "@" + <la valeur à envoyer à votre destinataire 1> +
+          "@" + <votre destinataire 2 > l'adresse du destinataire doit être décodé +
+          "@" + <la valeur à envoyer à votre destinataire 2> +
+          "@" + <votre destinataire 3 > l'adresse du destinataire doit être décodé +
+		  "@" + <la valeur à envoyer à votre destinataire 3> +
+          <...>
 }
