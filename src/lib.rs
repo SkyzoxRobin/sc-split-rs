@@ -22,22 +22,22 @@ pub trait Disperse:
 	#[endpoint(splitEGLD)]
 	fn split_egld(
 		&self,
-		token_amount: Self::BigUint,
-		#[var_args] args: VarArgs<MultiArg2<Address, Self::BigUint>>
+		#[payment_amount] token_amount: BigUint,
+		#[var_args] args: VarArgs<MultiArg2<ManagedAddress, BigUint>>
 	) -> SCResult<()> {
 
-		let mut sum = Self::BigUint::zero(); 
+		let mut sum = BigUint::zero(); 
 		let arguments = args.into_vec(); 
 
-		for payment in arguments.clone() {
-			let (_recipient, amount) = payment.into_tuple();
+		for check_payment in arguments.clone() {
+			let (_recipient, amount) = check_payment.into_tuple();
 			sum += amount; 
-		};
+		}
 
-		require!(token_amount == sum, "The sum sent is not equal to the total amount");
+		require!(token_amount == sum, "The sum sent is not equal to the total amount to send");
 		
-		for payment in arguments {
-			let (recipient, amount) = payment.into_tuple(); 
+		for split_payment in arguments {
+			let (recipient, amount) = split_payment.into_tuple(); 
 			self.send().direct_egld(&recipient, &amount, b"splitEGLD",);
 		}
 
@@ -50,22 +50,22 @@ pub trait Disperse:
 	fn split_esdt(
 		&self,
 		#[payment_token] token_id: TokenIdentifier,
-		token_amount: Self::BigUint,
-		#[var_args] args: VarArgs<MultiArg2<Address, Self::BigUint>>
+		#[payment_amount] token_amount: BigUint,
+		#[var_args] args: VarArgs<MultiArg2<ManagedAddress, BigUint>>
 	) -> SCResult<()> {
 
-		let mut sum = Self::BigUint::zero();
+		let mut sum = BigUint::zero();
 		let arguments = args.into_vec(); 
 
-		for payment in arguments.clone() {
-			let (_recipient, amount) = payment.into_tuple(); 
+		for check_payment in arguments.clone() {
+			let (_recipient, amount) = check_payment.into_tuple(); 
 			sum += amount; 
-		}; 
+		}
 
 		require!(token_amount == sum, "The sum sent is not equal to the total amount");
 
-		for payment in arguments {
-			let (recipient, amount) = payment.into_tuple();
+		for split_payment in arguments {
+			let (recipient, amount) = split_payment.into_tuple();
 			self.send().direct(&recipient, &token_id, 0, &amount, b"splitESDT",);
 		}
 
@@ -73,19 +73,19 @@ pub trait Disperse:
 	}
 
 	// split sft
-	#[payable("*")]
-	#[endpoint(splitSFT)]
-	fn split_sft(
-		&self,
-		#[var_args] args: VarArgs<MultiArg4<TokenIdentifier, u64, Address, Self::BigUint>>
-	) -> SCResult<()> {
+	// #[payable("*")]
+	// #[endpoint(splitSFT)]
+	// fn split_sft(
+	//	&self,
+	//	#[var_args] args: VarArgs<MultiArg4<TokenIdentifier, u64, Address, Self::BigUint>>
+	// ) -> SCResult<()> {
 
-		for payment in args.into_vec(){
-			let (token_id, nonce, recipient, amount) = payment.into_tuple();
-			self.send().direct(&recipient, &token_id, nonce, &amount, b"splitESDT",);
-		}
+	//	for payment in args.into_vec(){
+	//		let (token_id, nonce, recipient, amount) = payment.into_tuple();
+	//		self.send().direct(&recipient, &token_id, nonce, &amount, b"splitESDT",);
+	//	}
 
-		Ok(())
-	}
+	//	Ok(())
+	//}
 
 }
