@@ -1,5 +1,5 @@
-extern crate disperse;
-use disperse::*;
+extern crate presale;
+use presale::*;
 use elrond_wasm::*;
 use elrond_wasm_debug::*;
 

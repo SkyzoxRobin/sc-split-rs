@@ -27,3 +27,4 @@ Interact with existing contract:
 ```
 python3 ./interaction/playground.py --pem=my.pem --proxy=https://testnet-gateway.elrond.com --contract=erd1...
 ```
+# sc-presale-rs

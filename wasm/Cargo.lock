@@ -32,23 +32,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
-name = "disperse"
-version = "0.0.0"
-dependencies = [
- "elrond-wasm",
- "elrond-wasm-derive",
- "elrond-wasm-node",
-]
-
-[[package]]
-name = "disperse-wasm"
-version = "0.0.0"
-dependencies = [
- "disperse",
- "elrond-wasm-output",
-]
-
-[[package]]
 name = "elrond-codec"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -177,6 +160,23 @@ name = "once_cell"
 version = "1.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "692fcb63b64b1758029e0a96ee63e049ce8c5948587f2f7208df04625e5f6b56"
+
+[[package]]
+name = "presale"
+version = "0.0.0"
+dependencies = [
+ "elrond-wasm",
+ "elrond-wasm-derive",
+ "elrond-wasm-node",
+]
+
+[[package]]
+name = "presale-wasm"
+version = "0.0.0"
+dependencies = [
+ "elrond-wasm-output",
+ "presale",
+]
 
 [[package]]
 name = "proc-macro2"

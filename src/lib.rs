@@ -8,84 +8,137 @@ elrond_wasm::imports!();
 // elrond_wasm::derive_imports!();
 
 #[elrond_wasm_derive::contract]
-pub trait Disperse:
+pub trait Presale:
  config::ConfigModule 
  {
 	#[init]
 	fn init(
 		&self,
+		the_nft_price: BigUint,
 	) -> SCResult<()> {
+		self.nft_price().set(&the_nft_price);
 		Ok(())
 	}
+
+	// fn issue token
+	#[only_owner]
+	#[payable("EGLD")]
+	#[endpoint(issuePresaleToken)]
+	fn issue_presale_token(
+		&self,
+		#[payment] issue_cost: BigUint,
+        token_name: ManagedBuffer,
+        token_ticker: ManagedBuffer,
+	) -> SCResult<AsyncCall> {
+		require!(self.presale_token_id().is_empty(), "Already issued");
+
+        Ok(self.send()
+            .esdt_system_sc_proxy()
+            .issue_semi_fungible(
+                issue_cost,
+                &token_name,
+                &token_ticker,
+                SemiFungibleTokenProperties {
+                    can_freeze: true,
+                    can_wipe: true,
+                    can_pause: true,
+                    can_change_owner: true,
+                    can_upgrade: true,
+                    can_add_special_roles: true,
+                },
+            )
+            .async_call()
+            .with_callback(
+                self.callbacks()
+                    .issue_callback(&self.blockchain().get_caller()))
+            )
+    }
+
+	#[only_owner]
+	#[endpoint(setLocalRolesPresaleToken)]
+	#[payable("EGLD")]
+	fn set_local_roles_presale_token(&self) -> SCResult<AsyncCall> {
+		// self.require_token_issued()?;
+		require!(!self.presale_token_id().is_empty(), "No presale token issued");
+
+		let token = self.presale_token_id().get();
+
+		let roles = [
+            EsdtLocalRole::NftCreate,
+            EsdtLocalRole::NftAddQuantity,
+            EsdtLocalRole::NftBurn,
+        ];
+
+		Ok(self.send()
+			.esdt_system_sc_proxy()
+			.set_special_roles(
+				&self.blockchain().get_sc_address(),
+				&token,
+				(&roles[..]).into_iter().cloned()
+			)
+			.async_call())
+
+	}
+
+
+	// fn enter presale
 
 	#[payable("EGLD")]
-	#[endpoint(splitEGLD)]
-	fn split_egld(
+	#[endpoint(enterPresale)]
+	fn enter_presale(
 		&self,
-		#[payment_amount] token_amount: BigUint,
-		#[var_args] args: VarArgs<MultiArg2<ManagedAddress, BigUint>>
+		#[payment] _payment: BigUint,
+		// #[var_args] args: VarArgs<MultiArg2<ManagedAddress, BigUint>>
 	) -> SCResult<()> {
+		require!(!self.presale_token_id().is_empty(), "No presale token issued");
 
-		let mut sum = BigUint::zero(); 
-		let arguments = args.into_vec(); 
-
-		for check_payment in arguments.clone() {
-			let (_recipient, amount) = check_payment.into_tuple();
-			sum += amount; 
-		}
-
-		require!(token_amount == sum, "The sum sent is not equal to the total amount to send");
-		
-		for split_payment in arguments {
-			let (recipient, amount) = split_payment.into_tuple(); 
-			self.send().direct_egld(&recipient, &amount, b"splitEGLD",);
-		}
-
+			// get caller 
+		let _caller = self.blockchain().get_caller();
+		let _token = self.presale_token_id().get();
+			// add quantity sft
+			
+			// send SFT to the caller
 		Ok(())
 	}
 
-	// split esdt 
-	#[payable("*")]
-	#[endpoint(splitESDT)]
-	fn split_esdt(
-		&self,
-		#[payment_token] token_id: TokenIdentifier,
-		#[payment_amount] token_amount: BigUint,
-		#[var_args] args: VarArgs<MultiArg2<ManagedAddress, BigUint>>
-	) -> SCResult<()> {
+	// fn enter presale only for whitelisted people
 
-		let mut sum = BigUint::zero();
-		let arguments = args.into_vec(); 
+	//view 
 
-		for check_payment in arguments.clone() {
-			let (_recipient, amount) = check_payment.into_tuple(); 
-			sum += amount; 
-		}
+	#[view(getNftPrice)]
+    #[storage_mapper("getNftPrice")]
+    fn nft_price(&self) -> SingleValueMapper<BigUint>;
 
-		require!(token_amount == sum, "The sum sent is not equal to the total amount");
+	// whitelist 
 
-		for split_payment in arguments {
-			let (recipient, amount) = split_payment.into_tuple();
-			self.send().direct(&recipient, &token_id, 0, &amount, b"splitESDT",);
-		}
+	// token id
 
-		Ok(())
-	}
+	#[view(nftTokenId)]
+    #[storage_mapper("nftTokenId")]
+    fn presale_token_id(&self) -> SingleValueMapper<TokenIdentifier>;
 
-	// split sft
-	// #[payable("*")]
-	// #[endpoint(splitSFT)]
-	// fn split_sft(
-	//	&self,
-	//	#[var_args] args: VarArgs<MultiArg4<TokenIdentifier, u64, Address, Self::BigUint>>
-	// ) -> SCResult<()> {
+	//callback
+	#[callback]
+    fn issue_callback(
+        &self,
+        caller: &ManagedAddress,
+        #[call_result] result: ManagedAsyncCallResult<TokenIdentifier>,
+    ) {
+        match result {
+            ManagedAsyncCallResult::Ok(token_id) => {
 
-	//	for payment in args.into_vec(){
-	//		let (token_id, nonce, recipient, amount) = payment.into_tuple();
-	//		self.send().direct(&recipient, &token_id, nonce, &amount, b"splitESDT",);
-	//	}
+                if self.presale_token_id().is_empty() {
+                    self.presale_token_id().set(&token_id);
+                }
+            }
+            ManagedAsyncCallResult::Err(_) => {
 
-	//	Ok(())
-	//}
+                let (returned_tokens, token_id) = self.call_value().payment_token_pair();
+                if token_id.is_egld() && returned_tokens > 0 {
+                    let _ = self.send().direct_egld(caller, &returned_tokens, &[]);
+                }
+            }
+        }
+    }
 
 }

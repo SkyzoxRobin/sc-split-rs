@@ -72,16 +72,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "disperse"
-version = "0.0.0"
-dependencies = [
- "elrond-wasm",
- "elrond-wasm-debug",
- "elrond-wasm-derive",
- "elrond-wasm-node",
-]
-
-[[package]]
 name = "elrond-codec"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -291,6 +281,16 @@ name = "opaque-debug"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "624a8340c38c1b80fd549087862da4ba43e08858af025b236e509b6649fc13d5"
+
+[[package]]
+name = "presale"
+version = "0.0.0"
+dependencies = [
+ "elrond-wasm",
+ "elrond-wasm-debug",
+ "elrond-wasm-derive",
+ "elrond-wasm-node",
+]
 
 [[package]]
 name = "proc-macro2"

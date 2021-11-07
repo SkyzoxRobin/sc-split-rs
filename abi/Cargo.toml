@@ -1,5 +1,5 @@
 [package]
-name = "disperse-abi"
+name = "presale-abi"
 
 version = "0.0.0"
 authors = [ "you",]
@@ -8,7 +8,7 @@ publish = false
 
 [dev-dependencies]
 
-[dependencies.disperse]
+[dependencies.presale]
 path = ".."
 
 [dependencies.elrond-wasm]

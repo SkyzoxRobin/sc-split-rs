@@ -1,5 +1,5 @@
 [package]
-name = "disperse-wasm"
+name = "presale-wasm"
 version = "0.0.0"
 authors = [ "you",]
 edition = "2018"
@@ -20,7 +20,7 @@ lto = true
 debug = false
 panic = "abort"
 
-[dependencies.disperse]
+[dependencies.presale]
 features = [ "wasm-output-mode",]
 default-features = false
 path = ".."
