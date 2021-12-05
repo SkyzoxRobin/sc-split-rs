@@ -1,22 +1,15 @@
 #![no_std]
 
-// Import files here
-pub mod config;
-
-// Import Elrond Wasm
 elrond_wasm::imports!();
-// elrond_wasm::derive_imports!();
+elrond_wasm::derive_imports!();
 
-#[elrond_wasm_derive::contract]
-pub trait Disperse:
- config::ConfigModule 
+#[elrond_wasm::contract]
+pub trait Disperse
  {
 	#[init]
 	fn init(
 		&self,
-	) -> SCResult<()> {
-		Ok(())
-	}
+	) {}
 
 	#[payable("EGLD")]
 	#[endpoint(splitEGLD)]
@@ -25,21 +18,16 @@ pub trait Disperse:
 		#[payment_amount] token_amount: BigUint,
 		#[var_args] args: VarArgs<MultiArg2<ManagedAddress, BigUint>>
 	) -> SCResult<()> {
-
 		let mut sum = BigUint::zero(); 
-		let arguments = args.into_vec(); 
+		let arguments = args.into_vec();
 
-		for check_payment in arguments.clone() {
-			let (_recipient, amount) = check_payment.into_tuple();
-			sum += amount; 
+		for check_payment in arguments {
+			let (recipient, amount) = check_payment.into_tuple();
+			sum += amount.clone(); 
+
+			self.send().direct_egld(&recipient, &amount, &[],);
 		}
-
 		require!(token_amount == sum, "The sum sent is not equal to the total amount to send");
-		
-		for split_payment in arguments {
-			let (recipient, amount) = split_payment.into_tuple(); 
-			self.send().direct_egld(&recipient, &amount, b"splitEGLD",);
-		}
 
 		Ok(())
 	}
@@ -57,18 +45,13 @@ pub trait Disperse:
 		let mut sum = BigUint::zero();
 		let arguments = args.into_vec(); 
 
-		for check_payment in arguments.clone() {
-			let (_recipient, amount) = check_payment.into_tuple(); 
-			sum += amount; 
-		}
+		for check_payment in arguments {
+			let (recipient, amount) = check_payment.into_tuple(); 
+			sum += amount.clone(); 
 
+			self.send().direct(&recipient, &token_id, 0, &amount, &[],);
+		}
 		require!(token_amount == sum, "The sum sent is not equal to the total amount");
-
-		for split_payment in arguments {
-			let (recipient, amount) = split_payment.into_tuple();
-			self.send().direct(&recipient, &token_id, 0, &amount, b"splitESDT",);
-		}
-
 		Ok(())
 	}
 

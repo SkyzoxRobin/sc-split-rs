@@ -8,11 +8,6 @@ publish = false
 [lib]
 crate-type = [ "cdylib",]
 
-[workspace]
-members = [ ".",]
-
-[dev-dependencies]
-
 [profile.release]
 codegen-units = 1
 opt-level = "z"
@@ -21,10 +16,11 @@ debug = false
 panic = "abort"
 
 [dependencies.disperse]
-features = [ "wasm-output-mode",]
-default-features = false
 path = ".."
 
+[dependencies.elrond-wasm-node]
+version = "0.23.0"
+
 [dependencies.elrond-wasm-output]
-version = "0.20"
-features = [ "wasm-output-mode",]
+version = "0.23.0"
+features = [ "wasm-output-mode" ]
