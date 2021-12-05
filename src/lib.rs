@@ -1,22 +1,15 @@
 #![no_std]
 
-// Import files here
-pub mod config;
-
-// Import Elrond Wasm
 elrond_wasm::imports!();
-// elrond_wasm::derive_imports!();
+elrond_wasm::derive_imports!();
 
-#[elrond_wasm_derive::contract]
-pub trait Disperse:
- config::ConfigModule 
+#[elrond_wasm::contract]
+pub trait Disperse
  {
 	#[init]
 	fn init(
 		&self,
-	) -> SCResult<()> {
-		Ok(())
-	}
+	) {}
 
 	#[payable("EGLD")]
 	#[endpoint(splitEGLD)]
@@ -38,9 +31,8 @@ pub trait Disperse:
 		
 		for split_payment in arguments {
 			let (recipient, amount) = split_payment.into_tuple(); 
-			self.send().direct_egld(&recipient, &amount, b"splitEGLD",);
+			self.send().direct_egld(&recipient, &amount, &[],);
 		}
-
 		Ok(())
 	}
 
@@ -68,7 +60,6 @@ pub trait Disperse:
 			let (recipient, amount) = split_payment.into_tuple();
 			self.send().direct(&recipient, &token_id, 0, &amount, b"splitESDT",);
 		}
-
 		Ok(())
 	}
 

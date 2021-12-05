@@ -1,4 +1,16 @@
+////////////////////////////////////////////////////
+////////////////// AUTO-GENERATED //////////////////
+////////////////////////////////////////////////////
+
 #![no_std]
 
-pub use disperse::*;
-pub use elrond_wasm_output::*;
+elrond_wasm_node::wasm_endpoints! {
+    disperse
+    (
+        init
+        splitEGLD
+        splitESDT
+    )
+}
+
+elrond_wasm_node::wasm_empty_callback! {}
