@@ -23,7 +23,7 @@ pub trait Disperse
 
 		for check_payment in arguments {
 			let (recipient, amount) = check_payment.into_tuple();
-			sum += amount.clone(); 
+			sum += amount.clone();
 
 			self.send().direct_egld(&recipient, &amount, &[],);
 		}
@@ -54,21 +54,4 @@ pub trait Disperse
 		require!(token_amount == sum, "The sum sent is not equal to the total amount");
 		Ok(())
 	}
-
-	// split sft
-	// #[payable("*")]
-	// #[endpoint(splitSFT)]
-	// fn split_sft(
-	//	&self,
-	//	#[var_args] args: VarArgs<MultiArg4<TokenIdentifier, u64, Address, Self::BigUint>>
-	// ) -> SCResult<()> {
-
-	//	for payment in args.into_vec(){
-	//		let (token_id, nonce, recipient, amount) = payment.into_tuple();
-	//		self.send().direct(&recipient, &token_id, nonce, &amount, b"splitESDT",);
-	//	}
-
-	//	Ok(())
-	//}
-
 }
